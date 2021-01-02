@@ -8,7 +8,8 @@ This is a simple plugin for [Alliance Auth](https://gitlab.com/allianceauth/alli
 2. add `'mumbletagger',` to INSTALLED_APPS in your local.py
 3. migrate database and restart auth
 4. Setup your tags in the admin panel
-6. Run the population command outlined bellow
+5. job done.
+
 
 ## Pics 
 

@@ -32,6 +32,7 @@ class TagAssociationAdmin(admin.ModelAdmin):
         )
        
     _groups.short_description = 'groups'
+    filter_horizontal = ['groups']
 
 
 admin.site.register(TagAssociation, TagAssociationAdmin)
