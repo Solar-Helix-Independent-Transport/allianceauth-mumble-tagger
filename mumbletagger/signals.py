@@ -1,6 +1,6 @@
 from django.dispatch import receiver
 
-from django.db.models.signals import pre_save, m2m_changed
+from django.db.models.signals import pre_save, m2m_changed, post_save, post_delete
 from allianceauth.groupmanagement.models import GroupRequest
 from allianceauth.authentication.models import UserProfile, CharacterOwnership, EveCharacter
 from allianceauth.eveonline.evelinks.eveimageserver import  type_icon_url, character_portrait_url
@@ -23,12 +23,11 @@ if mumble_active():
         try:
             logger.debug("New / updated mumble tags for %s" % mu_instance.user.profile.main_character)
             groups = mu_instance.user.groups.all()
-            tags = []
+            tags = set()
             for ta in TagAssociation.objects.filter(enabled=True):
                 for ta_g in ta.groups.all():
                     if ta_g in groups:
-                        tags.append(ta.tag)
-                        break
+                        tags.add(ta.tag)
             if len(tags) > 0:
                 old_display_name = NameFormatter(MumbleService(), mu_instance.user).format_name()
                 new_display_name = "{} {}".format(old_display_name,
@@ -41,7 +40,7 @@ if mumble_active():
 
     @receiver(pre_save, sender=MumbleUser)
     def mumble_user_presave(sender, instance: MumbleUser, **kwargs):
-        instance = update_name(instance)
+        update_name(instance)
 
     @receiver(m2m_changed, sender=User.groups.through)
     def m2m_changed_user_groups(sender, instance, action, *args, **kwargs):
@@ -63,6 +62,21 @@ if mumble_active():
             logger.debug("Waiting for commit to trigger service group update for %s" % instance)
             transaction.on_commit(trigger_tag_update)
 
+    @receiver(post_save, sender=TagAssociation)
+    def new_tag(sender, instance: TagAssociation, created, **kwargs):
+        def trigger_tag_update():
+            for mu in MumbleUser.objects.all():
+                update_name(mu)
+
+        transaction.on_commit(trigger_tag_update)
+
+    @receiver(post_delete, sender=TagAssociation)
+    def rem_tag(sender, instance: TagAssociation, **kwargs):
+        def trigger_tag_update():
+            for mu in MumbleUser.objects.all():
+                update_name(mu)
+
+        transaction.on_commit(trigger_tag_update)
 
 class temp_disconnect_signal():
     """ Temporarily disconnect a model from a signal """
