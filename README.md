@@ -13,6 +13,14 @@ This is a simple plugin for [Alliance Auth](https://gitlab.com/allianceauth/alli
 
 ## Pics 
 
+### Admin Setup Demo
+
+![Imgur](https://i.imgur.com/ivihrLX.png)
+
+### User in Mumble
+
+![Imgur](https://i.imgur.com/QJ6b4ws.png)
+
 ## Contribute
 
 All contributions are welcome, but please if you create a PR for functionality or bugfix, do not mix in unrelated formatting changes along with it.
