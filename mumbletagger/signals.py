@@ -67,6 +67,13 @@ if mumble_active():
         def trigger_tag_update():
             for mu in MumbleUser.objects.all():
                 update_name(mu)
+                signal_args = {
+                    'signal': pre_save,
+                    'receiver': mumble_user_presave,
+                    'sender': MumbleUser, 
+                }
+                with temp_disconnect_signal(**signal_args):
+                    mu.save()
 
         transaction.on_commit(trigger_tag_update)
 
@@ -75,6 +82,13 @@ if mumble_active():
         def trigger_tag_update():
             for mu in MumbleUser.objects.all():
                 update_name(mu)
+                signal_args = {
+                    'signal': pre_save,
+                    'receiver': mumble_user_presave,
+                    'sender': MumbleUser, 
+                }
+                with temp_disconnect_signal(**signal_args):
+                    mu.save()
 
         transaction.on_commit(trigger_tag_update)
 
